@@ -1,0 +1,6 @@
+{
+  "name": "Student Stress Level Prediction",
+  "description": "AI-based student stress level prediction application with machine learning and automated Excel logging.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

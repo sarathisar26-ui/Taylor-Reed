@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Stress Level Prediction</title>
+    <meta name="description" content="AI-based student stress level prediction application with machine learning and automated Excel logging." />
+    <meta property="og:title" content="Student Stress Level Prediction" />
+    <meta property="og:description" content="AI-based student stress level prediction application with machine learning and automated Excel logging." />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="app-container" id="app-root">
+      
+      <!-- Top Navigation & Header -->
+      <header class="app-header" id="main-header">
+        <div class="header-brand">
+          <div class="brand-icon" id="brand-logo" aria-hidden="true">AI</div>
+          <div class="brand-info">
+            <h1 id="app-title">Student Stress Level Predictor</h1>
+            <p id="app-tagline">Machine Learning Lifestyle Assessment & Automated Excel Record-Keeping</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="nav-tab-group" id="view-tabs" role="tablist">
+            <button class="nav-tab-btn active" id="tab-predict" role="tab" aria-selected="true">Prediction Form</button>
+            <button class="nav-tab-btn" id="tab-history" role="tab" aria-selected="false">Excel Records</button>
+            <button class="nav-tab-btn" id="tab-analytics" role="tab" aria-selected="false">Analytics</button>
+          </div>
+          <a href="/download-excel" class="btn-secondary" id="btn-download-excel" download="student_data.xlsx">
+            <span>Download Excel</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- View 1: Main Prediction Form & Results -->
+      <main class="main-grid" id="view-predict-container">
+        
+        <!-- Left Column: Lifestyle & Academic Input Form -->
+        <section class="card" id="form-card">
+          <div class="card-header">
+            <div>
+              <h2 id="form-heading">Student Lifestyle & Academic Profile</h2>
+              <p class="card-subtitle">Fill in details or choose a sample preset below</p>
+            </div>
+            <div class="system-status-pill" id="api-status-pill">
+              <span class="status-dot" id="status-indicator"></span>
+              <span id="status-text">Model Ready</span>
+            </div>
+          </div>
+
+          <!-- Quick Fill Sample Presets -->
+          <div class="preset-bar" id="preset-container">
+            <span class="preset-label">Test Presets:</span>
+            <button type="button" class="preset-chip" id="preset-relaxed">Low Stress Profile</button>
+            <button type="button" class="preset-chip" id="preset-balanced">Balanced Student</button>
+            <button type="button" class="preset-chip" id="preset-highstress">High Stress Crunch</button>
+          </div>
+
+          <form id="stress-prediction-form" novalidate>
+            <div class="form-grid">
+              
+              <!-- Student Name -->
+              <div class="form-group form-group-full">
+                <label for="input-name">
+                  <span>Student Full Name</span>
+                  <span class="field-hint">Required</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="input-name" 
+                  name="name" 
+                  class="input-control" 
+                  placeholder="e.g. Jordan Rivera" 
+                  required 
+                  maxlength="100"
+                />
+              </div>
+
+              <!-- Age -->
+              <div class="form-group">
+                <label for="input-age">
+                  <span>Age (Years)</span>
+                  <span class="field-hint">15 – 35</span>
+                </label>
+                <input 
+                  type="number" 
+                  id="input-age" 
+                  name="age" 
+                  class="input-control" 
+                  placeholder="20" 
+                  min="10" 
+                  max="100" 
+                  required 
+                />
+              </div>
+
+              <!-- GPA / Academic Performance -->
+              <div class="form-group">
+                <label for="input-gpa">
+                  <span>Academic GPA</span>
+                  <span class="field-hint">Scale 0.0 – 10.0</span>
+                </label>
+                <input 
+                  type="number" 
+                  id="input-gpa" 
+                  name="gpa" 
+                  class="input-control" 
+                  placeholder="8.5" 
+                  step="0.1" 
+                  min="0" 
+                  max="10" 
+                  required 
+                />
+              </div>
+
+              <!-- Sleep Hours per Day -->
+              <div class="form-group">
+                <label for="input-sleep">
+                  <span>Sleep Hours</span>
+                  <span class="field-hint">Hours per day</span>
+                </label>
+                <div class="slider-container">
+                  <input 
+                    type="range" 
+                    id="input-sleep" 
+                    name="sleep_hours" 
+                    class="slider-input" 
+                    min="2" 
+                    max="14" 
+                    step="0.5" 
+                    value="7.5" 
+                  />
+                  <span class="slider-value-box" id="val-sleep">7.5h</span>
+                </div>
+              </div>
+
+              <!-- Study Hours per Day -->
+              <div class="form-group">
+                <label for="input-study">
+                  <span>Study Hours</span>
+                  <span class="field-hint">Hours per day</span>
+                </label>
+                <div class="slider-container">
+                  <input 
+                    type="range" 
+                    id="input-study" 
+                    name="study_hours" 
+                    class="slider-input" 
+                    min="0" 
+                    max="16" 
+                    step="0.5" 
+                    value="5.0" 
+                  />
+                  <span class="slider-value-box" id="val-study">5.0h</span>
+                </div>
+              </div>
+
+              <!-- Screen Time per Day -->
+              <div class="form-group">
+                <label for="input-screen">
+                  <span>Screen Time</span>
+                  <span class="field-hint">Hours per day</span>
+                </label>
+                <div class="slider-container">
+                  <input 
+                    type="range" 
+                    id="input-screen" 
+                    name="screen_time" 
+                    class="slider-input" 
+                    min="1" 
+                    max="16" 
+                    step="0.5" 
+                    value="4.5" 
+                  />
+                  <span class="slider-value-box" id="val-screen">4.5h</span>
+                </div>
+              </div>
+
+              <!-- Physical Activity per Week -->
+              <div class="form-group">
+                <label for="input-physical">
+                  <span>Physical Activity</span>
+                  <span class="field-hint">Hours per week</span>
+                </label>
+                <div class="slider-container">
+                  <input 
+                    type="range" 
+                    id="input-physical" 
+                    name="physical_activity" 
+                    class="slider-input" 
+                    min="0" 
+                    max="20" 
+                    step="0.5" 
+                    value="4.0" 
+                  />
+                  <span class="slider-value-box" id="val-physical">4.0h</span>
+                </div>
+              </div>
+
+              <!-- Social Support Scale (1 to 5) -->
+              <div class="form-group form-group-full">
+                <label for="input-social">
+                  <span>Social Support Scale</span>
+                  <span class="field-hint">1 (Very Low / Isolated) to 5 (Strong Support Network)</span>
+                </label>
+                <div class="slider-container">
+                  <input 
+                    type="range" 
+                    id="input-social" 
+                    name="social_support" 
+                    class="slider-input" 
+                    min="1" 
+                    max="5" 
+                    step="1" 
+                    value="4" 
+                  />
+                  <span class="slider-value-box" id="val-social">4 / 5</span>
+                </div>
+              </div>
+
+            </div>
+
+            <button type="submit" class="submit-btn" id="btn-submit-prediction">
+              <span id="btn-submit-text">Predict Stress Level</span>
+            </button>
+          </form>
+        </section>
+
+        <!-- Right Column: AI Prediction Result & Excel Confirmation -->
+        <section class="card" id="result-card-container">
+          <div class="card-header">
+            <div>
+              <h2 id="result-heading">Assessment Result</h2>
+              <p class="card-subtitle">Random Forest ML classification</p>
+            </div>
+          </div>
+
+          <!-- Initial State (Before Prediction) -->
+          <div class="result-placeholder" id="result-empty-state">
+            <div class="placeholder-icon" aria-hidden="true">&#9878;</div>
+            <p><strong>No Prediction Run Yet</strong></p>
+            <p class="field-hint">Fill out the student details and click "Predict Stress Level" to analyze.</p>
+          </div>
+
+          <!-- Active Result Content (Shown on Prediction) -->
+          <div id="result-active-content" style="display: none;">
+            
+            <div class="result-card" id="result-badge-card">
+              <div class="result-badge-row">
+                <span class="result-stress-badge" id="res-badge-text">Medium Stress</span>
+                <span class="result-timestamp" id="res-timestamp">Just now</span>
+              </div>
+              <div class="result-main-level" id="res-level-title">Moderate Stress Level</div>
+              <p class="result-description" id="res-description">
+                The student is experiencing moderate strain. Maintaining regular sleep schedules and limiting screen exposure will keep stress within safe margins.
+              </p>
+
+              <!-- Confidence Meter -->
+              <div class="confidence-container">
+                <div class="confidence-header">
+                  <span>AI Confidence Score</span>
+                  <span id="res-confidence-num">88.5%</span>
+                </div>
+                <div class="confidence-bar-bg">
+                  <div class="confidence-bar-fill" id="res-confidence-bar" style="width: 88.5%;"></div>
+                </div>
+
+                <!-- Probability breakdown -->
+                <div class="prob-breakdown" id="res-prob-breakdown">
+                  <div class="prob-cell">
+                    <div class="prob-cell-label">Low</div>
+                    <div class="prob-cell-val" id="prob-low">8%</div>
+                  </div>
+                  <div class="prob-cell">
+                    <div class="prob-cell-label">Medium</div>
+                    <div class="prob-cell-val" id="prob-med">82%</div>
+                  </div>
+                  <div class="prob-cell">
+                    <div class="prob-cell-label">High</div>
+                    <div class="prob-cell-val" id="prob-high">10%</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recommendation Advice -->
+              <div class="advice-box" id="advice-box">
+                <div class="advice-title" id="advice-title">Recommendations:</div>
+                <ul class="advice-list" id="advice-list">
+                  <li>Maintain at least 7-8 hours of regular sleep.</li>
+                  <li>Schedule breaks to keep non-study screen time under control.</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Excel Logging Confirmation Banner -->
+            <div class="excel-status-banner" id="excel-logging-status">
+              <div class="excel-status-left">
+                <div class="excel-icon">XLS</div>
+                <div class="excel-status-text">
+                  <strong>Logged into student_data.xlsx</strong>
+                  <span id="excel-log-timestamp">Appended as new row with full inputs & prediction.</span>
+                </div>
+              </div>
+              <a href="/download-excel" class="btn-secondary" id="btn-result-download">Download</a>
+            </div>
+
+          </div>
+        </section>
+      </main>
+
+      <!-- View 2: Excel Records History View -->
+      <section class="card history-section" id="view-history-container">
+        <div class="card-header">
+          <div>
+            <h2>Server Excel Log (student_data.xlsx)</h2>
+            <p class="card-subtitle">All student submissions and ML predictions recorded on server</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn-secondary" id="btn-refresh-history">Refresh Log</button>
+            <a href="/download-excel" class="btn-secondary" download="student_data.xlsx">Download .xlsx</a>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="history-table" id="history-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Student Name</th>
+                <th>Age</th>
+                <th>Sleep (h)</th>
+                <th>Study (h)</th>
+                <th>Screen (h)</th>
+                <th>Exercise (h/wk)</th>
+                <th>Support</th>
+                <th>GPA</th>
+                <th>Predicted Stress</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody">
+              <tr>
+                <td colspan="11" style="text-align: center; padding: 24px; color: var(--color-text-muted);">
+                  Loading records from student_data.xlsx...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- View 3: Analytics & Trends Dashboard -->
+      <section class="card analytics-section" id="view-analytics-container">
+        <div class="card-header">
+          <div>
+            <h2>Student Stress Analytics & Trends</h2>
+            <p class="card-subtitle">Statistical metrics computed from all records in student_data.xlsx</p>
+          </div>
+          <button type="button" class="btn-secondary" id="btn-refresh-analytics">Refresh Analytics</button>
+        </div>
+
+        <!-- Metric KPI Cards -->
+        <div class="stats-grid" id="stats-kpi-grid">
+          <div class="stat-box">
+            <div class="stat-label">Total Submissions</div>
+            <div class="stat-value" id="stat-total-count">0</div>
+            <div class="stat-desc">Logged in student_data.xlsx</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Avg Sleep Hours</div>
+            <div class="stat-value" id="stat-avg-sleep">--</div>
+            <div class="stat-desc">Daily average per student</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Avg Study Hours</div>
+            <div class="stat-value" id="stat-avg-study">--</div>
+            <div class="stat-desc">Daily academic focus</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Avg Screen Time</div>
+            <div class="stat-value" id="stat-avg-screen">--</div>
+            <div class="stat-desc">Daily digital exposure</div>
+          </div>
+        </div>
+
+        <!-- Stress Distribution Breakdown Chart -->
+        <div class="chart-container">
+          <div class="chart-title">Stress Level Distribution</div>
+          
+          <div class="bar-row">
+            <div class="bar-labels">
+              <span>Low Stress</span>
+              <span id="chart-pct-low">0%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill bar-fill-low" id="chart-fill-low" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-labels">
+              <span>Medium Stress</span>
+              <span id="chart-pct-med">0%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill bar-fill-med" id="chart-fill-med" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="bar-row">
+            <div class="bar-labels">
+              <span>High Stress</span>
+              <span id="chart-pct-high">0%</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill bar-fill-high" id="chart-fill-high" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Footer Note -->
+      <footer class="app-footer">
+        <p>AI Student Stress Level Predictor &bull; scikit-learn Random Forest Classifier &bull; openpyxl / Excel Persistence</p>
+      </footer>
+
+    </div>
+
+    <!-- Frontend Interactive Script -->
+    <script>
+      (function() {
+        // Range slider value synchronizers
+        const sliders = [
+          { id: 'input-sleep', valId: 'val-sleep', suffix: 'h' },
+          { id: 'input-study', valId: 'val-study', suffix: 'h' },
+          { id: 'input-screen', valId: 'val-screen', suffix: 'h' },
+          { id: 'input-physical', valId: 'val-physical', suffix: 'h' },
+          { id: 'input-social', valId: 'val-social', suffix: ' / 5' }
+        ];
+
+        sliders.forEach(s => {
+          const el = document.getElementById(s.id);
+          const valEl = document.getElementById(s.valId);
+          if (el && valEl) {
+            el.addEventListener('input', () => {
+              valEl.textContent = el.value + s.suffix;
+            });
+          }
+        });
+
+        // Test Presets
+        const presets = {
+          relaxed: {
+            name: 'Taylor Reed',
+            age: 20,
+            gpa: 8.8,
+            sleep: 8.5,
+            study: 4.5,
+            screen: 3.5,
+            physical: 6.0,
+            social: 5
+          },
+          balanced: {
+            name: 'Alex Morgan',
+            age: 21,
+            gpa: 7.6,
+            sleep: 6.5,
+            study: 5.5,
+            screen: 5.5,
+            physical: 3.0,
+            social: 3
+          },
+          highstress: {
+            name: 'Jordan Hayes',
+            age: 22,
+            gpa: 6.2,
+            sleep: 4.5,
+            study: 9.0,
+            screen: 8.5,
+            physical: 1.0,
+            social: 1
+          }
+        };
+
+        function applyPreset(p) {
+          document.getElementById('input-name').value = p.name;
+          document.getElementById('input-age').value = p.age;
+          document.getElementById('input-gpa').value = p.gpa;
+          
+          document.getElementById('input-sleep').value = p.sleep;
+          document.getElementById('val-sleep').textContent = p.sleep + 'h';
+
+          document.getElementById('input-study').value = p.study;
+          document.getElementById('val-study').textContent = p.study + 'h';
+
+          document.getElementById('input-screen').value = p.screen;
+          document.getElementById('val-screen').textContent = p.screen + 'h';
+
+          document.getElementById('input-physical').value = p.physical;
+          document.getElementById('val-physical').textContent = p.physical + 'h';
+
+          document.getElementById('input-social').value = p.social;
+          document.getElementById('val-social').textContent = p.social + ' / 5';
+        }
+
+        document.getElementById('preset-relaxed')?.addEventListener('click', () => applyPreset(presets.relaxed));
+        document.getElementById('preset-balanced')?.addEventListener('click', () => applyPreset(presets.balanced));
+        document.getElementById('preset-highstress')?.addEventListener('click', () => applyPreset(presets.highstress));
+
+        // View Tabs switching
+        const tabPredict = document.getElementById('tab-predict');
+        const tabHistory = document.getElementById('tab-history');
+        const tabAnalytics = document.getElementById('tab-analytics');
+
+        const viewPredict = document.getElementById('view-predict-container');
+        const viewHistory = document.getElementById('view-history-container');
+        const viewAnalytics = document.getElementById('view-analytics-container');
+
+        function switchTab(activeTab, activeView) {
+          [tabPredict, tabHistory, tabAnalytics].forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          [viewPredict, viewHistory, viewAnalytics].forEach(v => {
+            v.classList.remove('active');
+            if (v.id === 'view-predict-container') {
+              v.style.display = 'none';
+            }
+          });
+
+          activeTab.classList.add('active');
+          activeTab.setAttribute('aria-selected', 'true');
+          
+          if (activeView.id === 'view-predict-container') {
+            activeView.style.display = 'grid';
+          } else {
+            activeView.classList.add('active');
+          }
+        }
+
+        tabPredict?.addEventListener('click', () => switchTab(tabPredict, viewPredict));
+        tabHistory?.addEventListener('click', () => {
+          switchTab(tabHistory, viewHistory);
+          loadHistory();
+        });
+        tabAnalytics?.addEventListener('click', () => {
+          switchTab(tabAnalytics, viewAnalytics);
+          loadAnalytics();
+        });
+
+        // Form Submit Handler
+        const form = document.getElementById('stress-prediction-form');
+        const submitBtn = document.getElementById('btn-submit-prediction');
+        const submitBtnText = document.getElementById('btn-submit-text');
+
+        form?.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          const name = document.getElementById('input-name').value.trim();
+          const age = parseInt(document.getElementById('input-age').value, 10);
+          const gpa = parseFloat(document.getElementById('input-gpa').value);
+          const sleep_hours = parseFloat(document.getElementById('input-sleep').value);
+          const study_hours = parseFloat(document.getElementById('input-study').value);
+          const screen_time = parseFloat(document.getElementById('input-screen').value);
+          const physical_activity = parseFloat(document.getElementById('input-physical').value);
+          const social_support = parseInt(document.getElementById('input-social').value, 10);
+
+          // Validation
+          if (!name) {
+            alert('Please enter student name.');
+            document.getElementById('input-name').focus();
+            return;
+          }
+          if (isNaN(age) || age < 10 || age > 100) {
+            alert('Please enter a valid age between 10 and 100.');
+            document.getElementById('input-age').focus();
+            return;
+          }
+          if (isNaN(gpa) || gpa < 0 || gpa > 10) {
+            alert('Please enter a valid GPA between 0.0 and 10.0.');
+            document.getElementById('input-gpa').focus();
+            return;
+          }
+
+          const payload = {
+            name,
+            age,
+            gpa,
+            sleep_hours,
+            study_hours,
+            screen_time,
+            physical_activity,
+            social_support
+          };
+
+          submitBtn.disabled = true;
+          submitBtnText.textContent = 'Analyzing with AI Model...';
+
+          try {
+            const res = await fetch('/predict', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({ detail: 'Prediction failed' }));
+              throw new Error(err.detail || 'Prediction request failed');
+            }
+
+            const data = await res.json();
+            displayResult(data, payload);
+          } catch (err) {
+            alert('Error: ' + err.message);
+          } finally {
+            submitBtn.disabled = false;
+            submitBtnText.textContent = 'Predict Stress Level';
+          }
+        });
+
+        function displayResult(data, input) {
+          const emptyState = document.getElementById('result-empty-state');
+          const activeContent = document.getElementById('result-active-content');
+          const card = document.getElementById('result-badge-card');
+          
+          emptyState.style.display = 'none';
+          activeContent.style.display = 'block';
+
+          const level = data.stress_level; // "Low", "Medium", "High"
+          
+          card.className = 'result-card stress-' + level.toLowerCase();
+          document.getElementById('res-badge-text').textContent = level + ' Stress Level';
+          document.getElementById('res-timestamp').textContent = data.timestamp || 'Recorded';
+          
+          const titles = {
+            'Low': 'Low Stress Level',
+            'Medium': 'Moderate Stress Level',
+            'High': 'High Stress Level'
+          };
+          document.getElementById('res-level-title').textContent = titles[level] || (level + ' Stress');
+
+          const descriptions = {
+            'Low': 'The student shows balanced lifestyle metrics with healthy recovery and supportive routines. Risk of academic burnout is currently low.',
+            'Medium': 'The student exhibits moderate academic and lifestyle load. Early lifestyle adjustments will prevent escalation into chronic fatigue.',
+            'High': 'High stress indicators detected across lifestyle factors. High risk of cognitive fatigue and academic burnout without prompt interventions.'
+          };
+          document.getElementById('res-description').textContent = descriptions[level] || '';
+
+          // Confidence
+          const confScore = data.confidence_score || 85;
+          document.getElementById('res-confidence-num').textContent = data.confidence || (confScore + '%');
+          document.getElementById('res-confidence-bar').style.width = confScore + '%';
+
+          // Probabilities
+          if (data.probabilities) {
+            document.getElementById('prob-low').textContent = (data.probabilities['Low'] || 0) + '%';
+            document.getElementById('prob-med').textContent = (data.probabilities['Medium'] || 0) + '%';
+            document.getElementById('prob-high').textContent = (data.probabilities['High'] || 0) + '%';
+          }
+
+          // Dynamic Recommendations based on student's lifestyle inputs
+          const adviceList = document.getElementById('advice-list');
+          adviceList.innerHTML = '';
+          const tips = [];
+
+          if (input.sleep_hours < 7.0) {
+            tips.push('Increase sleep to at least 7–8 hours nightly to aid cognitive recovery and memory consolidation.');
+          }
+          if (input.screen_time > 6.0) {
+            tips.push('Reduce recreational screen time by 1–2 hours, especially in the 60 minutes before bedtime.');
+          }
+          if (input.physical_activity < 3.0) {
+            tips.push('Introduce 30 minutes of moderate physical activity (walking, jogging, gym) 3–4 times weekly.');
+          }
+          if (input.social_support <= 2) {
+            tips.push('Engage with study peer groups, academic counselors, or campus wellness programs for social support.');
+          }
+          if (input.study_hours > 8.0) {
+            tips.push('Use Pomodoro cycles (50 min study / 10 min break) to avoid diminishing returns and mental exhaustion.');
+          }
+          if (tips.length === 0) {
+            tips.push('Great job! Your current schedule provides strong resilience against academic stress.');
+            tips.push('Continue maintaining balanced exercise, social engagement, and consistent rest.');
+          }
+
+          tips.forEach(t => {
+            const li = document.createElement('li');
+            li.textContent = t;
+            adviceList.appendChild(li);
+          });
+
+          // Scroll result card into view on small screens
+          if (window.innerWidth < 900) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+
+        // Fetch History
+        async function loadHistory() {
+          const tbody = document.getElementById('history-tbody');
+          try {
+            const res = await fetch('/history');
+            const data = await res.json();
+            const records = data.records || [];
+
+            if (records.length === 0) {
+              tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding: 24px;">No records found in student_data.xlsx.</td></tr>';
+              return;
+            }
+
+            tbody.innerHTML = '';
+            records.forEach(r => {
+              const tr = document.createElement('tr');
+              const stressLevel = r.Predicted_Stress_Level || 'Medium';
+              const badgeClass = 'badge-' + String(stressLevel).toLowerCase();
+
+              tr.innerHTML = `
+                <td>${r.Timestamp || '-'}</td>
+                <td><strong>${escapeHtml(r.Name || '')}</strong></td>
+                <td>${r.Age ?? '-'}</td>
+                <td>${r.Sleep_Hours ?? '-'}</td>
+                <td>${r.Study_Hours ?? '-'}</td>
+                <td>${r.Screen_Time ?? '-'}</td>
+                <td>${r.Physical_Activity ?? '-'}</td>
+                <td>${r.Social_Support ?? '-'} / 5</td>
+                <td>${r.GPA ?? '-'}</td>
+                <td><span class="badge-pill ${badgeClass}">${escapeHtml(stressLevel)}</span></td>
+                <td>${r.Confidence || '-'}</td>
+              `;
+              tbody.appendChild(tr);
+            });
+          } catch (err) {
+            tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding: 24px; color: #ef4444;">Failed to load records: ${err.message}</td></tr>`;
+          }
+        }
+
+        // Fetch Analytics
+        async function loadAnalytics() {
+          try {
+            const res = await fetch('/analytics');
+            const data = await res.json();
+
+            document.getElementById('stat-total-count').textContent = data.total_students || 0;
+            document.getElementById('stat-avg-sleep').textContent = (data.averages?.sleep ?? 0) + 'h';
+            document.getElementById('stat-avg-study').textContent = (data.averages?.study ?? 0) + 'h';
+            document.getElementById('stat-avg-screen').textContent = (data.averages?.screen ?? 0) + 'h';
+
+            const dist = data.distribution || { Low: 0, Medium: 0, High: 0 };
+            const total = data.total_students || 1;
+
+            const pctLow = Math.round((dist.Low / total) * 100);
+            const pctMed = Math.round((dist.Medium / total) * 100);
+            const pctHigh = Math.round((dist.High / total) * 100);
+
+            document.getElementById('chart-pct-low').textContent = `${dist.Low || 0} students (${pctLow}%)`;
+            document.getElementById('chart-fill-low').style.width = pctLow + '%';
+
+            document.getElementById('chart-pct-med').textContent = `${dist.Medium || 0} students (${pctMed}%)`;
+            document.getElementById('chart-fill-med').style.width = pctMed + '%';
+
+            document.getElementById('chart-pct-high').textContent = `${dist.High || 0} students (${pctHigh}%)`;
+            document.getElementById('chart-fill-high').style.width = pctHigh + '%';
+          } catch (err) {
+            console.error('Analytics load error:', err);
+          }
+        }
+
+        document.getElementById('btn-refresh-history')?.addEventListener('click', loadHistory);
+        document.getElementById('btn-refresh-analytics')?.addEventListener('click', loadAnalytics);
+
+        // Check Health on load
+        async function checkHealth() {
+          try {
+            const res = await fetch('/health');
+            const data = await res.json();
+            if (data.status === 'ok') {
+              document.getElementById('status-text').textContent = 'Model & Excel Online';
+            }
+          } catch {
+            document.getElementById('status-text').textContent = 'Connecting...';
+          }
+        }
+        checkHealth();
+
+        function escapeHtml(str) {
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        }
+
+        // Apply a nice initial default
+        applyPreset(presets.relaxed);
+      })();
+    </script>
+  </body>
+</html>
